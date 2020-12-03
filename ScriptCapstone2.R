@@ -12,6 +12,6 @@ coldef <- 'darkolivegreen4'
 filldef <- 'darkolivegreen2'
 
 
-# DATA WRANGING -----------------------------------------------------------
+# DATA WRANGLING -----------------------------------------------------------
 
 
