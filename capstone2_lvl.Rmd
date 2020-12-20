@@ -1,0 +1,115 @@
+---
+title: 'Edx Capstone: Prediction model Project'
+author: "Luis G. Vazquez de Lara Cisneros."
+date: "02/12/2020"
+output:
+  bookdown::pdf_document2: default
+urlcolor: blue
+params:
+  coldef: 'darkolivegreen4'
+  filldef: 'darkolivegreen2'
+bibliography: references.bib
+---
+
+```{=html}
+<!--IMPORTANT: THE FILE references.bib MUST BE IN THE WORKING DIRECTORY.
+Download references.bib from https://github.com/lvazdela/edx-capstone.git-->
+```
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE)
+
+```
+
+```{r librerias, message=FALSE, results='hide'}
+if(!require(tidyverse)) install.packages("tidyverse", repos = "http://cran.us.r-project.org")
+if(!require(caret)) install.packages("caret", repos = "http://cran.us.r-project.org")
+if(!require(lubridate)) install.packages("lubridate", repos = "http://cran.us.r-project.org")
+if(!require(knitr)) install.packages("knitr", repos = "http://cran.us.r-project.org")
+if(!require(kableExtra)) install.packages("kableExtra", repos = "http://cran.us.r-project.org")
+```
+
+```{r mortrate}
+mortrate <- round(116487/1289298*100, 2)
+```
+
+# Introduction/overview/executive summary
+
+Covid-19 is the name of a disease caused by SARS-CoV-2, a novel type of coronavirus thas has spread all over the world, presenting a severe threat to global health. The clinical presentation is very heterogeneuos, ranging from an asymptomatic disease, to a life threatening condition with respiratory failure. At present, a specific therapy is lacking. Because the mortality of hospitalized patients with this disease varies from country to country, it is imperative to develop prediction models tailored to the reality of the location. In Mexico, as of 17 december 2020, the health authorities reported 1,289,298 confirmed patients, with 116,487 deaths, around `r mortrate`% of reported cases [@secretaríadesaludsubsecretaríadeprevenciónypromocióndelasalud2020]. It has also been noted that the mortality of hospitalized patients varies from institution to institution. *The Mexican Institute of Social Security* (IMSS, after the initials in Spanish), carries the biggest burden of public health care and the highest mortality of patients hospitalized with covid-19 [@sáncheztalanquer2020].
+
+Medical researchers often use prediction models as an aid to estimate the probability of risk for a specific outcome, to inform their decision making. In recent years, an initive called The Transparent Reporting of a multivariable prediction model for Individual Prognosis Or Diagnosis (TRIPOD), made a statement consisting of a checklist with 22 items considered as essential for good reporting of these type of studies [@collins2015]. This work is the final assignment of the capstone course of the *Edx Data Science Professional Certificate*, where we learned the basics of machine learning techniques. Even though the course is introductory to this topic, I believe it gives the necessary knowledge to fullfill the TRIPOD requierements concerning the statistical analysis (table \@ref(tab:tripod1)) and presentation of results (table \@ref(tab:tripod2)).
+
+I will use a database of hospitalized patients from a mexican hospital and try to build a prediction model of mortality. I will also use the TRIPOD items as the framework to build the statistical analysis and the presentation of results. Besides, I will try to demonstrate the skills acquired concerning data wrangling.
+
++------------------------------+--------+----------------------------------------------------------------------------------------------------------------------------------------------------+
+| Topic                        | Item   | Checklist item                                                                                                                                     |
++==============================+========+====================================================================================================================================================+
+| Sample Size                  | 8      | Explain how the study size was arrived at.                                                                                                         |
++------------------------------+--------+----------------------------------------------------------------------------------------------------------------------------------------------------+
+| Missing data                 | 9      | Describe how missing data were handled (eg, complete-case analysis, single imputation, multiple imputation) with details of any imputation method. |
++------------------------------+--------+----------------------------------------------------------------------------------------------------------------------------------------------------+
+| Statistical analysis methods | 10a    | Describe how predictors were handled in the analyses.                                                                                              |
++------------------------------+--------+----------------------------------------------------------------------------------------------------------------------------------------------------+
+|                              | 10b    | Specify type of model, all model-building procedures (including any predictor selection), and method for internal validation.                      |
++------------------------------+--------+----------------------------------------------------------------------------------------------------------------------------------------------------+
+|                              | 10c    | For validation, describe how the predictions were calculated.                                                                                      |
++------------------------------+--------+----------------------------------------------------------------------------------------------------------------------------------------------------+
+|                              | 10d    | Specify all measures used to assess model performance and, if relevant, to compare multiple models.                                                |
++------------------------------+--------+----------------------------------------------------------------------------------------------------------------------------------------------------+
+|                              | 10e    | Describe any model updating (eg, re-calibration) arising from the validation, if done.                                                             |
++------------------------------+--------+----------------------------------------------------------------------------------------------------------------------------------------------------+
+| Development vs. validation   | 12     | For validation, identify any differences from the development data in setting, eligibility criteria, outcome, and predictors.                      |
++------------------------------+--------+----------------------------------------------------------------------------------------------------------------------------------------------------+
+
+: TRIPOD items concerning the statistical analysis (from [@collins2015]). (\#tab:tripod1)
+
++---------------------+--------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Topic               | Item   | Checklist item                                                                                                                                                                                        |
++=====================+========+=======================================================================================================================================================================================================+
+| Participants        | 13a    | Describe the flow of participants through the study, including the number of participants with and without the outcome and, if applicable, a summary of the follow-up time. A diagram may be helpful. |
++---------------------+--------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|                     | 13b    | Describe the characteristics of the participants (basic demographics, clinical features, available predictors), including the number of participants with missing data for predictors and outcome.    |
++---------------------+--------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|                     | 13c    | For validation, show a comparison with the development data of the distribution of important variables (demographics, predictors and outcome).                                                        |
++---------------------+--------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Model development   | 14a    | Specify the number of participants and outcome events in each analysis.                                                                                                                               |
++---------------------+--------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|                     | 14b    | If done, report the unadjusted association between each candidate predictor and outcome.                                                                                                              |
++---------------------+--------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Model specification | 15a    | Present the full prediction model to allow predictions for individuals (ie, all regression coefficients, and model intercept or baseline survival at a given time point).                             |
++---------------------+--------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|                     | 15b    | Explain how to the use the prediction model.                                                                                                                                                          |
++---------------------+--------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Model performance   | 16     | Report performance measures (with CIs) for the prediction model.                                                                                                                                      |
++---------------------+--------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+: TRIPOD items concerning the presentation of results (from [@collins2015]). (\#tab:tripod2)
+
+## Description of the database
+
+```{r rawdatabase, results = 'hide'}
+covid <- read.csv('data/covid.csv')
+
+engvar <- read_lines('data/engvar2.txt')
+codunits <- read_lines('data/engvar3utf8.txt')
+cases <- dim(covid)[1]
+variables <- dim(covid)[2]
+
+nomvar <- covid %>%
+  names
+rawdb <- tibble(code = nomvar, Description = engvar, cod_units = codunits)
+```
+
+The database comprises information from `r cases` hospital records, with `r variables` variables. Table \@ref(tab:trawdb) shows the column names of the database, with a short description of their meaning and the codification or units employed.
+
+```{r trawdb }
+kable(rawdb, caption = 'Description of the variables in the working database',
+      booktabs = TRUE,
+      col.names = c('Column name', 'Description', 'Codification/units'),
+      longtable = TRUE) %>%
+  kable_styling(full_width = FALSE,
+                latex_options = c('hold_position', 'repeat_header', 'striped')) %>%
+  column_spec(2, width = '18em') %>%
+  column_spec(3, width = '18em') %>%
+  row_spec(0, bold = TRUE)
+
+```
