@@ -16,7 +16,8 @@ bibliography: references.bib
 Download references.bib from https://github.com/lvazdela/edx-capstone.git-->
 ```
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, message = FALSE)
+knitr::opts_chunk$set(echo = FALSE,
+                      message = FALSE)
 
 ```
 
@@ -29,21 +30,21 @@ if(!require(kableExtra)) install.packages("kableExtra", repos = "http://cran.us.
 ```
 
 ```{r rawdatabase, results = 'hide'}
-covid <- read.csv('data/covid.csv')
+dbcovid <- read.csv('cscovid.csv')
 
 engvar <- read_lines('data/engvar2.txt')
 codunits <- read_lines('data/engvar3utf8.txt')
-cases <- dim(covid)[1]
-variables <- dim(covid)[2]
+cases <- dim(dbcovid)[1]
+variables <- dim(dbcovid)[2]
 
-nomvar <- covid %>%
+nomvar <- dbcovid %>%
   names
 rawdb <- tibble(code = nomvar, Description = engvar, cod_units = codunits)
 ```
 
 # Introduction/overview/executive summary
 
-Covid-19 is the name of a disease caused by SARS-CoV-2, a novel type of coronavirus that has spread all over the world, presenting a severe threat to global health. The clinical presentation is very heterogeneous, ranging from an asymptomatic disease, to a life threatening condition with respiratory failure. At present, a specific therapy is lacking. Because the mortality of hospitalized patients with this disease varies from country to country, it is imperative to develop prediction models tailored to the reality of the location. In Mexico, as of 17 December 2020, the health authorities reported 1,289,298 confirmed patients, with 116,487 deaths, around `r round(116487/1289298*100, 2)`% of reported cases [@secretaríadesaludsubsecretaríadeprevenciónypromocióndelasalud2020]. It has also been noted that the mortality of hospitalized patients varies from institution to institution. *The Mexican Institute of Social Security* (IMSS, after the initials in Spanish), carries the biggest burden of public health care and the highest mortality of patients hospitalized with covid-19 [@sáncheztalanquer2020].
+Covid-19 is the name of a disease caused by SARS-CoV-2, a novel type of coronavirus that has spread all over the world, presenting a severe threat to global health. The clinical presentation is very heterogeneous, ranging from an asymptomatic disease, to a life threatening condition with respiratory failure. At present, a specific therapy is lacking. Because the mortality of hospitalized patients with this disease varies from country to country, it is imperative to develop prediction models tailored to the reality of the location. In Mexico, as of 17 December 2020, the health authorities reported 1,289,298 confirmed patients, with 116,487 deaths, around `r round(116487/1289298*100, 2)`% of reported cases [@secretariadesalud2020]. It has also been noted that the mortality of hospitalized patients varies from institution to institution. *The Mexican Institute of Social Security* (IMSS, after the initials in Spanish), carries the biggest burden of public health care and the highest mortality of patients hospitalized with covid-19 [@sancheztalanquer2020].
 
 Medical researchers often use prediction models as an aid to estimate the probability of risk for a specific outcome, to inform their decision making. In recent years, an initiative called The Transparent Reporting of a multivariate prediction model for Individual Prognosis Or Diagnosis (TRIPOD), made a statement consisting of a checklist with 22 items considered as essential for good reporting of these type of studies [@collins2015]. This work is the final assignment of the capstone course of the *Edx Data Science Professional Certificate*, where we learned the basics of machine learning techniques. Even though the course is introductory to this topic, I believe it gives the necessary knowledge to fulfill the TRIPOD requirements concerning the statistical analysis (table \@ref(tab:tripod1)) and presentation of results (table \@ref(tab:tripod2)).
 
@@ -91,20 +92,20 @@ Medical researchers often use prediction models as an aid to estimate the probab
 
 : TRIPOD items concerning the presentation of results [from [@collins2015])]. (\#tab:tripod2)
 
-I will use a database of hospitalized patients from a Mexican hospital and try to build a mortality prediction model. The database comprises information from `r cases` hospital records, with `r variables` variables. Table \@ref(tab:trawdb) shows the column names of the database, with a short description of their meaning and the codification or units employed. I will also use the TRIPOD items as the framework to build the statistical analysis and the presentation of results. Besides, I will try to demonstrate the skills acquired concerning data wrangling. The key steps are as follows: The key steps are summarized as follows:
+I will use a database of hospitalized patients from a Mexican hospital and try to build a mortality prediction model. The database comprises information from `r cases` hospital records, with `r variables` variables. Table \@ref(tab:tbrawdb) shows the column names of the database, with a short description of their meaning and the codification or units employed. I will also use the TRIPOD items as the framework to build the statistical analysis and the presentation of results. Besides, I will try to demonstrate the skills acquired concerning data wrangling. The key steps are summarized as follows:
 
--   Prepare the database for a suitable statistical analysis, creating new variables with the dates provided.
--   Explore the data, to decide which variables will be used as predictors (*preprocessing*). In this step, I will use bivariate analysis.
--   Split the data set into a train and test sets.
--   Use logistic regression, k-nearest neighbors and random forest as prediction algorithms. I will use bootstrap for cross-validation to tune-up the parameters. I will use the `caret` package to build the algorithms.
+-   Prepare the database for a suitable statistical analysis.
+-   Explore the data, to decide which variables will be used as predictors (*preprocessing*). In this step, I will use bivariate analysis and imputation methods.
+-   Split the data set into train and test sets.
+-   Use logistic regression, k-nearest neighbors, classification and regression trees (CART) and random forest as prediction algorithms. I will use bootstrap for cross-validation to tune-up the parameters. I will use the `caret` package to build the algorithms.
 -   Compare the performance of the algorithms with the *overall accuracy* in the test set.
 
-```{r trawdb}
+```{r tbrawdb}
 kable(rawdb, caption = 'Description of the variables in the working database',
       col.names = c('Column name', 'Description', 'Codification/units'),
       longtable = TRUE) %>%
   kable_styling(full_width = FALSE,
-                latex_options = c('repeat_header', 'striped')) %>%
+                latex_options = c('repeat_header')) %>%
   column_spec(2, width = '18em') %>%
   column_spec(3, width = '18em') %>%
   row_spec(0, bold = TRUE)
@@ -112,4 +113,97 @@ kable(rawdb, caption = 'Description of the variables in the working database',
 
 # Methods/analysis
 
-Inico de analisis
+## Data wrangling
+
+I read the data from a `csv` file into an R object named `dbcovid`. The first thing I noticed is that date variables are of type `character`, thus I used the function `dmy` to transform the date variables into date type:
+
+```{r dbdates, echo=TRUE}
+dbcovid <- dbcovid %>% mutate(across(starts_with('fecha'), dmy))
+```
+
+The laboratory data must be of `numeric` type, but several are as `character` in `dbcovid`, hence there must be typos. Table \@ref(tab:tbnumerrors) shows these errors. To fix this problem, I use a `character` vector to put the names of the problematic variables, employ `regex` patterns and create a "catch-all" function, with the aid of the package `stringr`. 
+
+```{r tbnumerrors}
+#Check errors in numeric variables
+nomcadenas <- c('urea', 'creat', 'bun', 'plaq', 'ca', 'aat', 'alat')
+patron <- '([^\\d\\.])|(\\.{2,})' #Anything but digits or one decimal point.
+
+fpatron <- function(x){
+  x[str_which(x, pattern = patron)]
+}
+
+errores <- apply(dbcovid[, nomcadenas],2,fpatron )
+dberrores <- data.frame(mistakes = unlist(errores))
+kable(dberrores, caption = 'Typos in numeric variables',
+      col.names = c('Typos in numeric variables')) %>%
+  kable_styling(latex_options = c('hold_position'))
+```
+
+```{r fixnumeric, echo=TRUE, results='hide'}
+#Check errors in numeric variables
+nomcadenas <- c('urea', 'creat', 'bun', 'plaq', 'ca', 'aat', 'alat')
+patron <- '([^\\d\\.])|(\\.{2,})' #Anything but digits or one decimal point.
+
+fpatron <- function(x){
+  x[str_which(x, pattern = patron)]
+}
+
+errores <- apply(dbcovid[, nomcadenas],2,fpatron )
+
+# Catch-all function to detect errors in numeric variables
+farreglar <- function(x){
+  x = str_trim(x)
+  x = case_when(
+    str_detect(x, '\\s') ~ str_replace_all(x, '\\s', ''),
+    str_detect(x, '[:alpha:]') ~ str_replace_all(x, '[:alpha:]',''),
+    str_detect(x, ',|\\.{2,}') ~ str_replace_all(x,',|\\.{2,}', '.'),
+    TRUE ~ x
+  )
+}
+
+#Fix errors in numeric variables
+dbcovid <- dbcovid %>% mutate(across(all_of(nomcadenas), farreglar))
+#Check if it worked
+arregerrores <- apply(dbcovid[, nomcadenas],2,fpatron )
+arregerrores # no mistakes
+
+# Transform numeric variables to numeric type and check the structure
+dbcovid <- dbcovid %>% mutate(across(all_of(nomcadenas), as.numeric))
+dbcovid %>% select(all_of(nomcadenas)) %>% str
+
+```
+
+Next, I use the dates to calculate duration of some events, I also compute other variables such as the body mass index and the presence of obesity. As can be seen in table \@ref(tab:tbrawdb), the codification of dichotomic variables is not uniform; I change them accordingly using the number 1 to indicate that the feature is present. Finally, I transform all categorical variables to `factor` class.
+
+```{r wrandatecat, echo=TRUE, results='hide'}
+#Create new variables with dates, and eliminate the date variables.
+dbcovid <- dbcovid %>%
+  mutate(bmi = peso/talla^2, 
+         dayshosp = as.numeric(fechalta - fechahosp),
+         duration = as.numeric(fechalta - fechainisint),
+         daysdelay = as.numeric(fechahosp - fechainisint),
+         obesity = ifelse(bmi >= 30, 1, 2)) %>%
+  select(-starts_with('fecha'))
+  
+dim(dbcovid)  
+names(dbcovid) 
+
+# Change codification of dichotomous categorical variables.
+
+dicot <- c('motivoegre','has', 'tabaquismo', 'dm', 'renal', 'autoinmunidad',
+           'ing_disnea', 'obesity')
+dbcovid <- dbcovid %>%
+  mutate(across(all_of(dicot), function(x) ifelse(x == 2, 0, 1)))
+str(dbcovid)
+
+# Transform categorical variables to factors.
+nomcateg <- c('motivoegre','sexo', 'ocupacion', 'nivsoc', dicot[-1])
+dbcovid <- dbcovid %>%
+  mutate(across(all_of(nomcateg), as.factor))
+str(dbcovid)
+```
+
+## Data exploration
+
+Due to the number of variables, I decide to focus the exploration of data on the difference in the outcome. I use these results as the first filter to decide which variables are going to be in the prediction models.
+
