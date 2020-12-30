@@ -1,0 +1,51 @@
+Gender
+Occupation
+Schooling
+Socioeconomic level
+History of High blood pressure
+Smoking
+History of diabetes mellitus
+History of renal failure
+History of autoimmune diseases
+Age
+Weight
+Height
+Temperature
+Heart rate
+Respiratory rate
+Arterial pressure, systolic
+Arterial pressure, diastolic
+Severity score
+Short of breath at the moment of hospitalization
+Oxygen saturation
+Blood urea
+Blood urea nitrogen
+Serum creatinine
+Serum cholesterol
+Blood glucose
+Hemoglobin concentration
+White blood cells
+Platelets
+Lymphocytes
+Monocytes
+Eosinophils
+Basophils
+Neutrophils
+Potassium
+Sodium
+Chloride
+Calcium
+pH 
+Arterial oxygen partial pressure
+Arterial carbon dioxide partial pressure
+Arterial bicarbonate
+Serum lactate dehydrogenase
+Serum Alanine aminotransferase
+Serum Aspartate aminotransferase
+D-dimer
+Date of consultation
+Date of covid-19 testing
+Date of hospitalization
+Date of hospital discharge
+Date of appearance of first symptoms
+Vital status at the moment of discharge

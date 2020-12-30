@@ -27,10 +27,18 @@ if(!require(caret)) install.packages("caret", repos = "http://cran.us.r-project.
 if(!require(lubridate)) install.packages("lubridate", repos = "http://cran.us.r-project.org")
 if(!require(knitr)) install.packages("knitr", repos = "http://cran.us.r-project.org")
 if(!require(kableExtra)) install.packages("kableExtra", repos = "http://cran.us.r-project.org")
+if(!require(randomForest)) install.packages("randomForest", repos = "http://cran.us.r-project.org")
 ```
 
+```{r dnldfiles}
+urlfile <- 'https://raw.githubusercontent.com/lvazdela/capstone2_lvl/main/cscovid.csv'
+dbcovid <- read.csv(urlfile)
+
+```
+
+
 ```{r rawdatabase, results = 'hide'}
-dbcovid <- read.csv('cscovid.csv')
+#dbcovid <- read.csv('cscovid.csv')
 
 engvar <- read_lines('data/engvar2.txt')
 codunits <- read_lines('data/engvar3utf8.txt')
