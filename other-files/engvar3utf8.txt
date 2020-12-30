@@ -1,0 +1,51 @@
+0 = Female, 1 = Male
+1 = Health care worker, 2 = Office job, 3 = Outdoor work, 4 = Work in public area,5 = Work at home, 6 = Unemployed
+1 = Analphabet, 2 = Primary school, 3 = Junior high school, 4 = High school, 5 = College, 6 = Postgraduate studies
+1 = Low, Medium-low, 2 = Medium-high, High
+1 = Yes, 2 = No
+1 = Yes, 2 = No
+1 = Yes, 2 = No
+1 = Yes, 2 = No
+1 = Yes, 2 = No
+Years old
+kg
+m
+Centigrades
+Beats per minute
+Cicles per minute
+mm Hg
+mm Hg
+Score points (0-16)
+1 = Yes, 2 = No
+Percentage of Saturated hemoglobin
+mg/dL
+mg/dL
+mg/dL
+mg/dL
+mg/dL
+mg/dL
+number of cells/µL
+number of cells/µL
+number of cells/µL
+number of cells/µL
+number of cells/µL
+number of cells/µL
+number of cells/µL
+mEq/L
+mEq/L
+mEq/L
+mEq/L
+Units of pH
+mEq/L
+mEq/L
+mEq/L
+IU/L
+IU/L
+IU/L
+D-dimer µg/mL
+
+
+
+
+
+2 = Alive, 3 = Dead
