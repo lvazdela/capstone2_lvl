@@ -1,0 +1,40 @@
+Schooling
+Age
+Weight
+Height
+Temperature
+Heart rate
+Respiratory rate
+Arterial pressure, systolic
+Arterial pressure, diastolic
+Severity score
+Oxygen saturation
+Blood urea
+Blood urea nitrogen
+Serum creatinine
+Serum cholesterol
+Blood glucose
+Hemoglobin concentration
+White blood cells
+Platelets
+Lymphocytes
+Monocytes
+Eosinophils
+Basophils
+Neutrophils
+Potassium
+Sodium
+Chloride
+Calcium
+pH 
+Arterial oxygen partial pressure
+Arterial carbon dioxide partial pressure
+Arterial bicarbonate
+Serum lactate dehydrogenase
+Serum Alanine aminotransferase
+Serum Aspartate aminotransferase
+D-dimer
+Body mass index
+Days hospitalized
+Duration
+Days of delay
