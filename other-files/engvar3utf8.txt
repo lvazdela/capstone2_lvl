@@ -24,13 +24,13 @@ mg/dL
 mg/dL
 mg/dL
 mg/dL
-number of cells/µL
-number of cells/µL
-number of cells/µL
-number of cells/µL
-number of cells/µL
-number of cells/µL
-number of cells/µL
+number of cells/ÂµL
+number of cells/ÂµL
+number of cells/ÂµL
+number of cells/ÂµL
+number of cells/ÂµL
+number of cells/ÂµL
+number of cells/ÂµL
 mEq/L
 mEq/L
 mEq/L
@@ -42,7 +42,7 @@ mEq/L
 IU/L
 IU/L
 IU/L
-D-dimer µg/mL
+µg/mL
 
 
 

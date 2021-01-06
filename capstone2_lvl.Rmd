@@ -11,37 +11,37 @@ params:
 bibliography: references.bib
 ---
 
-```{=html}
-<!--IMPORTANT: THE FILE references.bib MUST BE IN THE WORKING DIRECTORY.
-Download references.bib from https://github.com/lvazdela/edx-capstone.git-->
-```
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE,
-                      message = FALSE)
+                      message = FALSE,
+                      warning = FALSE)
 
 ```
 
 ```{r librerias, message=FALSE, results='hide'}
-if(!require(tidyverse)) install.packages("tidyverse", repos = "http://cran.us.r-project.org")
-if(!require(caret)) install.packages("caret", repos = "http://cran.us.r-project.org")
-if(!require(lubridate)) install.packages("lubridate", repos = "http://cran.us.r-project.org")
-if(!require(knitr)) install.packages("knitr", repos = "http://cran.us.r-project.org")
-if(!require(kableExtra)) install.packages("kableExtra", repos = "http://cran.us.r-project.org")
-if(!require(randomForest)) install.packages("randomForest", repos = "http://cran.us.r-project.org")
+if(!require(tidyverse)) install.packages("tidyverse", repos = "http://cran.us.r-project.org", dependencies = TRUE)
+if(!require(caret)) install.packages("caret", repos = "http://cran.us.r-project.org", dependencies = TRUE)
+if(!require(lubridate)) install.packages("lubridate", repos = "http://cran.us.r-project.org", dependencies = TRUE)
+if(!require(knitr)) install.packages("knitr", repos = "http://cran.us.r-project.org", dependencies = TRUE)
+if(!require(kableExtra)) install.packages("kableExtra", repos = "http://cran.us.r-project.org", dependencies = TRUE)
+if(!require(randomForest)) install.packages("randomForest", repos = "http://cran.us.r-project.org", dependencies = TRUE)
 ```
 
 ```{r dnldfiles}
-urlfile <- 'https://raw.githubusercontent.com/lvazdela/capstone2_lvl/main/cscovid.csv'
-dbcovid <- read.csv(urlfile)
+#download.file('https://raw.githubusercontent.com/lvazdela/capstone2_lvl/main/references.bib', 'references.bib', quiet = TRUE)
+urlcscovid <- 'https://raw.githubusercontent.com/lvazdela/capstone2_lvl/main/cscovid.csv'
+dbcovid <- read.csv(urlcscovid)
 
+urlengvar <- 'https://raw.githubusercontent.com/lvazdela/capstone2_lvl/main/other-files/engvar2.txt'
+engvar <- read_lines(urlengvar)
+urlcodunits <- read_lines('https://raw.githubusercontent.com/lvazdela/capstone2_lvl/main/other-files/engvar3utf8.txt')
+codunits <- read_lines(urlcodunits)
+
+urlengvarnum <- 'https://raw.githubusercontent.com/lvazdela/capstone2_lvl/main/other-files/engvarnum.txt'
+engvarnum <- read_lines(urlengvarnum)
 ```
 
-
 ```{r rawdatabase, results = 'hide'}
-#dbcovid <- read.csv('cscovid.csv')
-
-engvar <- read_lines('data/engvar2.txt')
-codunits <- read_lines('data/engvar3utf8.txt')
 cases <- dim(dbcovid)[1]
 variables <- dim(dbcovid)[2]
 
@@ -54,7 +54,7 @@ rawdb <- tibble(code = nomvar, Description = engvar, cod_units = codunits)
 
 Covid-19 is the name of a disease caused by SARS-CoV-2, a novel type of coronavirus that has spread all over the world, presenting a severe threat to global health. The clinical presentation is very heterogeneous, ranging from an asymptomatic disease, to a life threatening condition with respiratory failure. At present, a specific therapy is lacking. Because the mortality of hospitalized patients with this disease varies from country to country, it is imperative to develop prediction models tailored to the reality of the location. In Mexico, as of 17 December 2020, the health authorities reported 1,289,298 confirmed patients, with 116,487 deaths, around `r round(116487/1289298*100, 2)`% of reported cases [@secretariadesalud2020]. It has also been noted that the mortality of hospitalized patients varies from institution to institution. *The Mexican Institute of Social Security* (IMSS, after the initials in Spanish), carries the biggest burden of public health care and the highest mortality of patients hospitalized with covid-19 [@sancheztalanquer2020].
 
-Medical researchers often use prediction models as an aid to estimate the probability of risk for a specific outcome, to inform their decision making. In recent years, an initiative called The Transparent Reporting of a multivariate prediction model for Individual Prognosis Or Diagnosis (TRIPOD), made a statement consisting of a checklist with 22 items considered as essential for good reporting of these type of studies [@collins2015]. This work is the final assignment of the capstone course of the *Edx Data Science Professional Certificate*, where we learned the basics of machine learning techniques. Even though the course is introductory to this topic, I believe it gives the necessary knowledge to fulfill the TRIPOD requirements concerning the statistical analysis (table \@ref(tab:tripod1)) and presentation of results (table \@ref(tab:tripod2)).
+Medical researchers often use prediction models as an aid to estimate the probability of risk for a specific outcome, to inform their decision making. In recent years, an initiative called *The Transparent Reporting of a multivariate prediction model for Individual Prognosis Or Diagnosis* (TRIPOD), made a statement consisting of a checklist with 22 items considered as essential for good reporting of these type of studies [@collins2015]. This work is the final assignment of the capstone course of the *Edx Data Science Professional Certificate*, where we learned the basics of machine learning techniques. Even though the course is introductory to this topic, I believe it gives the necessary knowledge to fulfill the TRIPOD requirements concerning the statistical analysis (table \@ref(tab:tripod1)) and presentation of results (table \@ref(tab:tripod2)).
 
 +------------------------------+------+-----------------------------------------------------------------------------------------------------------------------------------------------------+
 | Topic                        | Item | Checklist item                                                                                                                                      |
@@ -100,12 +100,12 @@ Medical researchers often use prediction models as an aid to estimate the probab
 
 : TRIPOD items concerning the presentation of results [from [@collins2015])]. (\#tab:tripod2)
 
-I will use a database of hospitalized patients from a Mexican hospital and try to build a mortality prediction model. The database comprises information from `r cases` hospital records, with `r variables` variables. Table \@ref(tab:tbrawdb) shows the column names of the database, with a short description of their meaning and the codification or units employed. I will also use the TRIPOD items as the framework to build the statistical analysis and the presentation of results. Besides, I will try to demonstrate the skills acquired concerning data wrangling. The key steps are summarized as follows:
+I will use a database of hospitalized patients from a Mexican hospital and try to build an outcom prediction model. The database comprises information from `r cases` hospital records, with `r variables` variables. Table \@ref(tab:tbrawdb) shows the column names of the database, with a short description of their meaning and the codification or units employed. I will also use the TRIPOD items as the framework to build the statistical analysis and the presentation of results. Besides, I will try to demonstrate the skills acquired concerning data wrangling. The key steps are summarized as follows:
 
 -   Prepare the database for a suitable statistical analysis.
 -   Explore the data, to decide which variables will be used as predictors (*preprocessing*). In this step, I will use bivariate analysis and imputation methods.
 -   Split the data set into train and test sets.
--   Use logistic regression, k-nearest neighbors, classification and regression trees (CART) and random forest as prediction algorithms. I will use bootstrap for cross-validation to tune-up the parameters. I will use the `caret` package to build the algorithms.
+-   Use logistic regression, k-nearest neighbors, classification and regression trees (CART) and random forest as prediction algorithms. I will use bootstrap as a resampling method to tune-up the parameters. I will use the `caret` package to build the algorithms.
 -   Compare the performance of the algorithms with the *overall accuracy* in the test set.
 
 ```{r tbrawdb}
@@ -123,15 +123,15 @@ kable(rawdb, caption = 'Description of the variables in the working database',
 
 ## Data wrangling
 
-I read the data from a `csv` file into an R object named `dbcovid`. The first thing I noticed is that date variables are of type `character`, thus I used the function `dmy` to transform the date variables into date type:
+I read the data from a `csv` file and created an R object named `dbcovid`. The first thing I noticed is that date variables are of type `character`, thus I used the function `dmy` to transform the date variables into date type:
 
 ```{r dbdates, echo=TRUE}
 dbcovid <- dbcovid %>% mutate(across(starts_with('fecha'), dmy))
 ```
 
-The laboratory data must be of `numeric` type, but several are as `character` in `dbcovid`, hence there must be typos. Table \@ref(tab:tbnumerrors) shows these errors. To fix this problem, I use a `character` vector to put the names of the problematic variables, employ `regex` patterns and create a "catch-all" function, with the aid of the package `stringr`. 
+The laboratory data must be of `numeric` type, but several are as `character` in `dbcovid`, hence there must be typos. Table \@ref(tab:tbnumerrors) shows these errors. To fix this problem, I used a `character` vector to put the names of the problematic variables, employed `regex` patterns and created a "catch-all" function, with the aid of the package `stringr`.
 
-```{r tbnumerrors}
+```{r tbnumerrors, results='asis'}
 #Check errors in numeric variables
 nomcadenas <- c('urea', 'creat', 'bun', 'plaq', 'ca', 'aat', 'alat')
 patron <- '([^\\d\\.])|(\\.{2,})' #Anything but digits or one decimal point.
@@ -143,7 +143,9 @@ fpatron <- function(x){
 errores <- apply(dbcovid[, nomcadenas],2,fpatron )
 dberrores <- data.frame(mistakes = unlist(errores))
 kable(dberrores, caption = 'Typos in numeric variables',
-      col.names = c('Typos in numeric variables')) %>%
+      col.names = c('Typos in numeric variables'),
+      booktabs = TRUE) %>%
+  row_spec(0, bold = TRUE) %>%
   kable_styling(latex_options = c('hold_position'))
 ```
 
@@ -175,13 +177,13 @@ dbcovid <- dbcovid %>% mutate(across(all_of(nomcadenas), farreglar))
 arregerrores <- apply(dbcovid[, nomcadenas],2,fpatron )
 arregerrores # no mistakes
 
-# Transform numeric variables to numeric type and check the structure
+# Transform numeric variables to numeric type 
 dbcovid <- dbcovid %>% mutate(across(all_of(nomcadenas), as.numeric))
-dbcovid %>% select(all_of(nomcadenas)) %>% str
+
 
 ```
 
-Next, I use the dates to calculate duration of some events, I also compute other variables such as the body mass index and the presence of obesity. As can be seen in table \@ref(tab:tbrawdb), the codification of dichotomic variables is not uniform; I change them accordingly using the number 1 to indicate that the feature is present. Finally, I transform all categorical variables to `factor` class.
+Next, I used the dates to calculate the duration of some events, I also computed other variables such as the body mass index and the presence of obesity. As can be seen in table \@ref(tab:tbrawdb), the codification of dichotomic variables is not uniform; I changed them accordingly using the number 1 to indicate that the feature is present. Finally, I transformed all categorical variables to the `factor` class.
 
 ```{r wrandatecat, echo=TRUE, results='hide'}
 #Create new variables with dates, and eliminate the date variables.
@@ -193,25 +195,600 @@ dbcovid <- dbcovid %>%
          obesity = ifelse(bmi >= 30, 1, 2)) %>%
   select(-starts_with('fecha'))
   
-dim(dbcovid)  
-names(dbcovid) 
-
 # Change codification of dichotomous categorical variables.
-
 dicot <- c('motivoegre','has', 'tabaquismo', 'dm', 'renal', 'autoinmunidad',
            'ing_disnea', 'obesity')
 dbcovid <- dbcovid %>%
   mutate(across(all_of(dicot), function(x) ifelse(x == 2, 0, 1)))
-str(dbcovid)
 
 # Transform categorical variables to factors.
 nomcateg <- c('motivoegre','sexo', 'ocupacion', 'nivsoc', dicot[-1])
 dbcovid <- dbcovid %>%
   mutate(across(all_of(nomcateg), as.factor))
-str(dbcovid)
+
 ```
 
 ## Data exploration
 
-Due to the number of variables, I decide to focus the exploration of data on the difference in the outcome. I use these results as the first filter to decide which variables are going to be in the prediction models.
+```{r dscroutcome}
+outcome <- dbcovid %>%
+  mutate(motivoegre = factor(motivoegre, labels = c('alive', 'dead'))) %>%
+  group_by(motivoegre) %>%
+  count
+alive <- outcome[1,2] %>% pull
+dead <- outcome[2,2] %>% pull
+```
 
+From the `r cases` patients, `r alive` survived (`r round(alive/cases*100, 1)`%), while `r dead` died (`r round(dead/cases*100, 1)`%); this means that I am facing a relatively unbalanced data. Due to the number of variables, I decided to focus the data exploration on the difference in the outcome, in order to use these results as the first filter to decide which variables are going to be in the prediction models. Tables \@ref(tab:tbvarcat) and \@ref(tab:tbvarnum) show the exploratory analysis of categorical and numeric variables. While some variables look like good candidates, many are not worth including them. Furthermore, looking at the column *valid cases*, I notice that many variables do not add up to the total number of cases, thus there are a lot of missing values.
+
+```{r descrcat, results='hide'}
+creatortabcat <- function(nomvar, etiq){
+  dbcovid %>%
+    select(motivoegre, all_of(nomvar)) %>%
+    mutate(across(all_of(nomvar), function(x) factor(x, labels = etiq))) %>%
+    mutate(motivoegre = factor(motivoegre, levels = c(0,1), labels = c('Alive', 'Dead'))) %>%
+    pivot_longer(all_of(nomvar), names_to = 'apps', values_to = 'valor') %>%
+    group_by(motivoegre, apps, valor) %>%
+    summarise(n = n()) %>%
+    mutate(frec = round(n/sum(n)*100, 2),
+           total = sum(n)) %>%
+    pivot_wider(names_from = motivoegre, values_from = c(n, frec, total)) %>%
+    mutate(total = n_Alive + n_Dead,
+           pordef = round(n_Dead/total*100, 1),
+           pormejo = round(n_Alive/total*100, 1),
+           muertos = paste0(str_pad(n_Dead,4,side = 'right', pad = ' '), '(', pordef, ')'),
+           vivos = paste0(str_pad(n_Alive,4,side = 'right'), '(', pormejo, ')')) %>% 
+    select(apps, valor, total, muertos, vivos) %>%
+    filter(!is.na(valor)) %>%
+    rename(Variable = apps, Value = valor, Total = total, Dead = muertos, Alive = vivos)
+}
+
+#data frames of summaries of categorical variables:
+dbsex <- creatortabcat('sexo', c('Female', 'Male'))
+
+englaboccup <- c('Health care worker', 'Office job','Outdoor work',
+                 'Work in public area', 'Work at home', 'Unemployed')
+dboccup <- creatortabcat('ocupacion', englaboccup)
+
+dbnivsoc <- creatortabcat('nivsoc', c('Low or medium-low', 'Medium-high or high'))
+
+dbdicot <- creatortabcat(dicot[-1], c('No', 'Yes'))
+
+#Join the dataframes:
+dbvarcateg <- bind_rows(dbsex, dboccup, dbnivsoc, dbdicot)
+
+#function to write the p value of chi-squared test in the database  
+fchipavarcateg <- function(x){
+  p <- round(chisq.test(table(x, dbcovid$motivoegre))$p.value, 3)
+  if (!is.factor(x)){
+    x <- as.factor(x)
+  } 
+  blancos <- length(levels(x)) -1
+  if (p < 0.001){
+    p <- '< 0.001'
+  }
+  cad <- c(p, rep('', blancos))
+  return(cad)
+}
+varcateg <- unique(dbvarcateg$Variable)
+  
+listachis <- unlist(apply(dbcovid[,varcateg],2, fchipavarcateg))
+numlistachis <- apply(dbcovid[,varcateg], 2, function(x){chisq.test(table(x, dbcovid$motivoegre))$p.value} )
+
+
+#Add listachisfin to the database and translate variables to English
+engvarord <- c('Autoimmunity', 'Diabetes', 'Hypertension', 'Short of breath', 'Socioeconomic level',
+               'Obesity', 'Occupation', 'Renal disease', 'Gender', 'Smoking')
+dbvarcateg <- dbvarcateg %>%
+  ungroup %>%
+  mutate(p = listachis,
+         Variable = factor(Variable, labels = engvarord))
+```
+
+```{r tbvarcat, results= 'asis'}
+pvalue <- paste0('\\textit{',names(dbvarcateg)[6],'}', footnote_marker_alphabet(2))
+hdead <- paste0(names(dbvarcateg)[4], footnote_marker_alphabet(1))
+halive <- paste0(names(dbvarcateg)[5], footnote_marker_alphabet(1))
+kable(dbvarcateg, caption = 'Exploratory data analysis of categorical variables',
+      booktabs = TRUE,
+      col.names = c('Variables', 'Category', 'Total', hdead, halive, pvalue),
+      escape = FALSE ) %>%
+  row_spec(0, bold = TRUE) %>%
+  kable_styling(latex_options = 'hold_position') %>%
+  footnote(alphabet = c("Values between parentheses represent the percentage for the corresponding category.","\\\\textit{p} value calculated with $\\\\chi^2$."),
+            escape = FALSE)
+
+```
+
+```{r dscrnum, results='hide'}
+# Exploratory analysis of numeric variables
+varnum <- dbcovid %>%
+  select(where(is.numeric)) %>%
+  names
+
+#engvarnum <- read_lines('data/engvarnum.txt')
+dbtranslator <- data.frame(spa = varnum, eng = engvarnum) %>%
+  arrange(spa)
+
+listapesnum <- apply(dbcovid[, varnum[-1]], 2, function(x) t.test(x ~ dbcovid$motivoegre)$p.value)
+umann <- wilcox.test(dbcovid$escolaridad ~ dbcovid$motivoegre)$p.value
+listapesnum <- round(c(umann, listapesnum), 3)
+listapesnum2 <- ifelse(listapesnum < 0.001, '< 0.001', listapesnum)
+#list of numeric variables in the model
+
+dftes2 <- data.frame(Variable = varnum, p = listapesnum2)
+
+dbvarnum <- dbcovid %>%
+  select(motivoegre, all_of(varnum)) %>%
+  mutate(motivoegre = factor(motivoegre, labels = c('Alive', 'Dead'))) %>%
+  group_by(motivoegre) %>%
+  summarise(across(everything(), list(
+    validos = ~ sum(!is.na(.x)),
+    prom = ~ round(mean(.x, na.rm = TRUE),2),
+    desvest = ~ round(sd(.x, na.rm = TRUE),2)
+  )))%>%
+  pivot_longer(cols = -motivoegre,
+               names_sep = '_',
+               names_to = c('Variable', '.value')) %>%
+  left_join(dftes2, by = 'Variable')%>%
+  unite(meansd, c(prom, desvest), sep = ' ± ') %>%
+  select(Variable, validos, motivoegre, meansd, p  )%>%
+  mutate(Variable = factor(Variable, labels = dbtranslator$eng)) %>%
+  arrange(p, Variable)
+
+```
+
+```{r tbvarnum}
+pvalue <- paste0('\\textit{',names(dbvarnum)[5],'}', footnote_marker_alphabet(1))
+kable(dbvarnum, caption = 'Exploratory data analysis of numerical variables',
+      booktabs = TRUE,
+      col.names = c('Variables', 'Valid cases', 'Status', 'Mean ± SD ', pvalue),
+      longtable = TRUE,
+      escape = FALSE ) %>%
+  row_spec(0, bold = TRUE) %>%
+  kable_styling(latex_options = 'repeat_header') %>%
+  footnote(alphabet = c("\\\\textit{p} value calculated with Student t test, except for \\\\textit{Schooling}, where the U Mann-Whitney test was used."),
+            escape = FALSE)
+```
+
+## Data Preprocessing
+
+First, I excluded the variables that were not significant in the bivariate analysis, choosing (arbitrarily) a cut-off value of *p* \< 0.051. I also excluded the length of hospital stay and the duration of the disease, as I am interested in the variables recorded the day of hospitalization.
+
+```{r finvars1, echo=TRUE}
+finalvarcateg <- varcateg[which(numlistachis < 0.051)]
+finalvarnum <- varnum[which(listapesnum < 0.051)]
+finalvarnum <- finalvarnum[1:24]
+dbcovid <- dbcovid %>%
+  select(all_of(c('motivoegre', finalvarcateg, finalvarnum))) %>%
+  mutate(motivoegre = factor(motivoegre, labels = c('Alive', 'Dead')),
+         sexo = factor(sexo, labels = c('Female', 'Male')),
+         nivsoc = factor(nivsoc, labels = c('low', 'High')),
+         dm = factor(dm, labels = c('No', 'Yes')),
+         has = factor(has, labels = c('No', 'Yes')),
+         tabaquismo = factor(tabaquismo, labels = c('No', 'Yes')),
+         ing_disnea = factor(ing_disnea, labels = c('No', 'Yes')))
+
+```
+
+```{r intrimpu}
+compcases <- dbcovid %>%
+  na.omit %>%
+  count %>%
+  pull
+lost <- (1 - (compcases/dim(dbcovid)[1]))*100
+lost <- round(lost)
+```
+
+As part of preprocessing, we also want to know if there are variables close to zero variation. The function `nearZeroVar` allows us to explore this situation. In this case, no variable was found to have this problem.
+
+```{r nzero, echo=TRUE, results='asis'}
+nearZeroVar(dbcovid)
+
+```
+
+In the next step, I checked the number of missing values in the selected variables (table \@ref(tab:tbnas)). The simplest form to deal with missing data is to restrict the analysis to individuals with complete data. In fact, this is the default approach in most of the prediction algorithms allowing missingness in `caret`. Considering the selection of variables that are significant, if I were to use *complete case analysis*, I would loose around `r lost`% of the cases, causing a reduction in efficiency. The other form to deal with this problem is using *imputation methods*.
+
+Dealing with missing data is always complicated. I did some research, and found that first we have to think on the reasons of missingness [@madley-dowd2019]. The missingness mechanism can be classified as:
+
+-   **Missing completely at random**: the probability of missingness is independent on observed or missing data.
+-   **Missing at random**: missingness independent of unobserved data, conditional on the observed data.
+-   **Missing not at random**: missingness dependent on unobserved data even after conditioning on observed data.
+
+In this study, considering how the data were acquired, it is reasonable to think that missingness is at random, hence, unbiased results can be obtained with large proportions of missing data. In the paper of Madley-Dowd, they simulated data and concluded that when missingness is at random, unbiased results can be obtained even when 90% of the data are missing [@madley-dowd2019]. Accordingly, the variables in table \@ref(tab:tbnas) were used to build the prediction models.
+
+The next consideration is the imputation method. Imputation methods can broadly be classified as *single* and *multiple*. In a single imputation procedure the value of a missing data element is filled by some means, such as the mean or the median of the observed values, without defining an explicit model. In multiple imputation, several draws of the missing elements are made from the posterior distribution of the missing data, given the observed data [@glas2010].
+
+The package `caret` has some functions that can be used for preprocessing the data. the `preProcess` function has several imputation methods. In this work, I used two methods of imputation: `medianImpute`, an example of single imputation which takes the median of each predictor in the training set, and `bagImpute`, an example of multiple imputation which fits a bagged tree model for each predictor[^1]. These methods create an object that has to be used in the `predict` function to finally have the imputed data sets (see code).
+
+[^1]: The methods used do not impute categorical variables. In this particular case, the final data set has only two missing data in these type of variables, thus I decided to omit the cases with this problem.
+
+```{r imput, echo=TRUE}
+#Impute with the median
+preprocmd <- preProcess(dbcovid, method = 'medianImpute')
+dbcovidmd <- predict(preprocmd, dbcovid )
+sum(is.na(dbcovidmd)) # Show the missings in the categorical variables
+dbcovidmd <- na.omit(dbcovidmd)
+sum(is.na(dbcovidmd)) #check we have no missing data
+#Imputation via bagging (if I leave the factor variables, it throws an error).
+set.seed(271220)
+preprocbag <- dbcovid %>%
+  select(where(is.numeric)) %>%
+  preProcess(., method = 'bagImpute')
+
+dbcovidbag <- dbcovid %>%
+  select(where(is.numeric)) %>%
+  predict(preprocbag, .)
+
+dbcovidbag <- dbcovid %>%
+  select(where(is.factor)) %>%
+  bind_cols(dbcovidbag) %>%
+  na.omit
+sum(is.na(dbcovidbag)) # check we have no missing data
+```
+
+```{r tbnas}
+dbnas <- dbcovid %>%
+  select(all_of(c('motivoegre', finalvarcateg, finalvarnum))) %>%
+  summarise(across(everything(),  ~sum(is.na(.x)) )) %>%
+  t(.) %>%
+  as.data.frame(.) %>%
+  rename(totalnas = V1) %>%
+  mutate(porcentaje = round(totalnas/dim(dbcovid)[1]*100,1),
+         len = dim(dbcovid)[1],
+         variable = row.names(.),
+         validos = len - totalnas) %>%
+  select(variable, validos, totalnas, porcentaje, len)%>%
+  arrange(desc(porcentaje))
+
+kable(dbnas, caption = "Missing values in the putative predictive variables",
+      booktabs = TRUE,
+      col.names = c("Variable", "Valid", "Total missing", "Percentage missing", "Total")) %>%
+  row_spec(0, bold = TRUE) %>%
+  kable_styling()
+```
+
+## Selection of the classification algorithms and evaluation metrics.
+
+The `caret` package embodies more than 200 classification and regression models. In this work, I used the following algorithms:
+
+-   Logistic regression, with the `glm` method.
+-   k-Nearest neighbors (kNN), with the `knn` method.
+-   Classification and regression trees (CART), with the `rpart` method.
+-   Random forests, with the `rf` method.
+
+When the output is continuous, the main goal of the machine learning algorithm is refered as *prediction*; when the output is categorical, then we use the word *classification* [@irizarry2019b]. Hence, as the outcome of the dataset is categorical, I will use this term going forward.
+
+In general, machine learning algorithms estimate conditional probabilities as function of the predictors. For classification models, we can represent the main task with the following expression:
+
+```{=tex}
+\begin{equation}
+\label{eq:condprob}
+p_k(\mathbf{x}) = \mbox{Pr}(Y=k \mid \mathbf{X}=\mathbf{x}), \, \mbox{for}\, k=1,\dots,K
+\end{equation}
+```
+where $\mathbf{X}$ represents the set of predictors, and $K$ the total number of classes of the categorical variable.
+
+Logistic regression is a specific case of a set of *generalized linear models*, it can be regarded as the simplest prediction model when the outcome is categorical. The *method kNN* is similar to bin smoothing, but easier to adapt to multiple dimensions; the general idea is to define a distance between all observations based on the values of the predictors, then we look for the $k$ nearest points and calculate the proportion of the outcome associated with these points [@irizarry2019a]. CART models predict an outcome variable $Y$ by partitioning the predictors, defining decision rules and creating *decision trees* with prediction at the ends, referred to as *nodes* [@irizarry2019c]. *Random forests* extend the concept of classification trees. The goal is to improve prediction performance with the construction of a number of individual trees randomly different through bootstrapping [@irizarry2019c].
+
+## Strategy of model generation
+
+When we build classification or regression models, because the data are random, the parameters and results obtained are also random variables. If we repeat the experiment the results are going to be different. According to the law of big numbers, after a lot of repetitions, results will tend to converge. Thus, one of the most important concepts in machine learning is the use of a resampling technique to stabilize the results. The `caret` package has a number of functions that help us to develop a good strategy for model building, including resampling. Once we preprocessed the data, the next step is to create a training set and a test set using the function `createDataPartition`.The text book of the course recommends the training set to be the biggest. Because the final data has `r dim(dbcovidbag)[1]` cases, to keep a decent amount of cases in the test set, I decided to partition the data into 85% of the cases for the training set and the remaining for the test set. Next, I chose the resampling method embedded in the function `train`. In this work I decided to use *bootstrap*; it is computationaly more expensive than *k-fold cross validation*, but the size of the data set makes it feasible.
+
+Before training any algorithm, we must decide on which evaluation metric to use. During the training step, the `train` function uses the *accuracy* as the default when the outcome is binary. *Overall accuracy* is defined as the proportion of cases that were correctly predicted in the test set [@irizarry2019a]. The function `confusionMatrix` calculates all the metrics for binary outcomes, and I will use it to calculate the overall accuracy.
+
+Many algorithms have parameters that have to be calibrated by means of resampling. For the algorithms selected in this work we have the following parameters:
+
+-   With `knn` we need to find the best value for the number of nearest neighbors with the argument `k`.
+-   With `rpart` we have to tune up the *complexity parameter* with the argument `cp`, this parameter sets a minimum for how much the evaluation metric must improve for another partition to be added, because if we split until every point is its own partition, we would be overtraining the model. Although not used as tunning parameters, we can also change, using customized functions, the minimum number of observations required in a partition before deciding the next partition (`minsplit`), as well as the number of observations in each node (`minbucket`) .
+-   With `rf` we tune up the number of variables randomly sampled as candidates at each split with `mtry`, but it is also possible to optimize other parameters such as the minimum node size with customized functions.
+
+In summary, for the purpose of this work, I trained the models with the bootstrap method, varying only the tunnning parameters and keeping the rest with the default values. The evaluation metric was accuracy.
+
+```{r datapartition}
+set.seed(271220)
+indtrainmd <- createDataPartition(y = dbcovidmd$motivoegre, times = 1, p = 0.85, list = FALSE)
+train_setmd <- dbcovidmd[indtrainmd,]
+test_setmd <- dbcovidmd[-indtrainmd,]
+
+set.seed(271220)
+indtrainbag <- createDataPartition(y = dbcovidbag$motivoegre, times = 1, p = 0.85, list = FALSE)
+train_setbag <- dbcovidbag[indtrainbag,]
+test_setbag <- dbcovidbag[-indtrainbag,]
+```
+
+```{r glm-model}
+tr.control <- trainControl(method = 'boot',
+                           number = 25)
+
+#Data set imputed with the median
+set.seed(271220)
+fit_glm <- train(motivoegre ~ .,
+                 method = 'glm',
+                 data = train_setmd,
+                 trControl = tr.control)
+
+model_glm <- predict(fit_glm, newdata = test_setmd, type = 'raw')
+cm <- confusionMatrix(data = model_glm, reference = test_setmd$motivoegre)
+acc_glmmd <- cm$overall[["Accuracy"]]
+acc_glmmdup <- cm$overall[["AccuracyUpper"]]
+acc_glmmdlo <-  cm$overall[["AccuracyLower"]]
+
+#Data set imputed with bagging
+set.seed(271220)
+fit_glm <- train(motivoegre ~ .,
+                 method = 'glm',
+                 data = train_setbag,
+                 trControl = tr.control)
+
+model_glm <- predict(fit_glm, newdata = test_setbag, type = 'raw')
+cm <- confusionMatrix(data = model_glm, reference = test_setbag$motivoegre)
+acc_glmbag <- cm$overall[["Accuracy"]]
+acc_glmbagup <- cm$overall[["AccuracyUpper"]]
+acc_glmbaglo <-  cm$overall[["AccuracyLower"]]
+
+varimpglm <- varImp(fit_glm)[["importance"]]
+nomvars <- row.names(varimpglm)
+varimpglm <- varimpglm %>%
+  mutate(varnameglm = nomvars) %>%
+  rename(valueglm = Overall) %>%
+  select(varnameglm, valueglm) %>%
+  arrange(desc(valueglm))
+
+```
+
+```{r knn-model}
+#Imputed with median
+set.seed(271220)
+fit_knn <- train(motivoegre ~ .,
+                 method = 'knn',
+                 tuneGrid = data.frame(k = seq(5,35, 1)),
+                 trControl = tr.control,
+                 data = train_setmd)
+
+model_knn <- predict(fit_knn, newdata = test_setmd)
+cm <- confusionMatrix(data = model_knn, reference = test_setmd$motivoegre)
+acc_knnmd <- cm$overall[["Accuracy"]]
+acc_knnmdup <- cm$overall[["AccuracyUpper"]]
+acc_knnmdlo <-  cm$overall[["AccuracyLower"]]
+
+#imputed with bagging
+set.seed(271220)
+fit_knn <- train(motivoegre ~ .,
+                 method = 'knn',
+                 tuneGrid = data.frame(k = seq(5,35, 1)),
+                 trControl = tr.control,
+                 data = train_setbag)
+
+model_knn <- predict(fit_knn, newdata = test_setbag)
+
+cm <- confusionMatrix(data = model_knn, reference = test_setbag$motivoegre)
+acc_knnbag <- cm$overall[["Accuracy"]]
+acc_knnbagup <- cm$overall[["AccuracyUpper"]]
+acc_knnbaglo <-  cm$overall[["AccuracyLower"]]
+
+btune_knn <- fit_knn$bestTune
+
+varimpknn <- varImp(fit_knn)$importance
+nomvars <- row.names(varimpknn)
+varimpknn <- varimpknn %>%
+  mutate(varnameknn = nomvars) %>%
+  rename(valueknn = Dead) %>%
+  select(-Alive) %>%
+  select(varnameknn, valueknn) %>%
+  arrange(desc(valueknn))
+
+```
+
+```{r rpart-model}
+#Imputed with bagging
+set.seed(271220)
+
+fit_rpart <- train(motivoegre ~ ., method = 'rpart',
+                   tuneGrid = data.frame(cp = seq(0, 0.05, 0.002)),
+                   trControl = tr.control,
+                   data = train_setbag)
+
+
+model_rpart <- predict(fit_rpart, newdata = test_setbag)
+cm <- confusionMatrix(data = model_rpart, reference = test_setbag$motivoegre)
+acc_rpartbag <- cm$overall[["Accuracy"]]
+acc_rpartbagup <- cm$overall[["AccuracyUpper"]]
+acc_rpartbaglo <-  cm$overall[["AccuracyLower"]]
+
+#Imputed with the median
+set.seed(271220)
+fit_rpart <- train(motivoegre ~ ., method = 'rpart',
+                   tuneGrid = data.frame(cp = seq(0, 0.05, 0.002)),
+                   trControl = tr.control,
+                   data = train_setmd)
+
+
+model_rpart <- predict(fit_rpart, newdata = test_setmd)
+cm <- confusionMatrix(data = model_rpart, reference = test_setmd$motivoegre)
+acc_rpartmd <- cm$overall[["Accuracy"]]
+acc_rpartmdup <- cm$overall[["AccuracyUpper"]]
+acc_rpartmdlo <-  cm$overall[["AccuracyLower"]]
+btune_rpart <-  fit_rpart$bestTune
+
+varimprpart <- varImp(fit_rpart)$importance
+nomvars <- row.names(varimprpart)
+varimprpart <- varimprpart %>%
+  mutate(varnamerpart = nomvars) %>%
+  rename(valuerpart = Overall) %>%
+  select(varnamerpart, valuerpart) %>%
+  arrange(desc(valuerpart))
+```
+
+```{r rf-model}
+control_rf <- trainControl(method = 'boot',
+                           number = 25)
+grid <- data.frame(mtry = c(1,5,10,25))
+
+#Imputed with bagging
+set.seed(271220)
+fit_rf <- train(motivoegre ~ .,
+                method = 'rf',
+                ntree = 150,
+                trControl = control_rf,
+                tuneGrid = grid,
+                data = train_setbag)
+
+model_rf <- predict(fit_rf, newdata = test_setbag)
+cm <- confusionMatrix(data = model_rf, reference = test_setbag$motivoegre)
+acc_rfbag <- cm$overall[["Accuracy"]]
+acc_rfbagup <- cm$overall[["AccuracyUpper"]]
+acc_rfbaglo <-  cm$overall[["AccuracyLower"]]
+
+#Imputed with the median
+set.seed(271220)
+fit_rf <- train(motivoegre ~ .,
+                method = 'rf',
+                ntree = 150,
+                trControl = control_rf,
+                tuneGrid = grid,
+                data = train_setmd)
+
+model_rf <- predict(fit_rf, newdata = test_setmd)
+cm <- confusionMatrix(data = model_rf, reference = test_setmd$motivoegre)
+acc_rfmd <- cm$overall[["Accuracy"]]
+acc_rfmdup <- cm$overall[["AccuracyUpper"]]
+acc_rfmdlo <-  cm$overall[["AccuracyLower"]]
+
+
+varimprf <- varImp(fit_rf)$importance
+nomvars <- row.names(varimprf)
+varimprf <- varimprf %>%
+  mutate(varnamerf = nomvars) %>%
+  rename(valuerf = Overall) %>%
+  select(varnamerf, valuerf) %>%
+  arrange(desc(valuerf))
+btune_rf <- fit_rf$bestTune %>% pull
+
+```
+
+# Results
+
+The four models tested were trained with both imputation methods. The summary of the accuracy obtained with each method is presented in table \@ref(tab:tbfinres), together with the 95% confidence interval. While the imputation method had little influence in the accuracy of the logistic regression and de kNN models, the CART and random forests algorithms tended to perform better with the median imputation, although the confidence intervals overlap. The algoritm that renders the best accuracy is the random forests with median imputation (`r acc_rfmd`).
+
+```{r tbfinres}
+accsmd <- c(acc_glmmd, acc_knnmd, acc_rpartmd, acc_rfmd)
+accsbag <- c(acc_glmbag,acc_knnbag, acc_rpartbag, acc_rfbag)
+accslomd <- c(acc_glmmdlo, acc_knnmdlo, acc_rpartmdlo, acc_rfmdlo)
+accslobag <- c(acc_glmbaglo, acc_knnbaglo, acc_rpartbaglo, acc_rfbaglo)
+accsupmd <- c(acc_glmmdup, acc_knnmdup, acc_rpartmdup, acc_rfmdup)
+accsupbag <- c(acc_glmbagup, acc_knnbagup, acc_rpartbagup, acc_rfbagup )
+model <- (c('Generalized linear model', 'k nearest neighbors', 'CART', 'Random forests'))
+
+dfresfin <- tibble(model = model,
+                   accsmd = accsmd,
+                   accslomd = accslomd,
+                   accsupmd = accsupmd,
+                   accsbag = accsbag,
+                   accslobag = accslobag,
+                   accsupbag = accsupbag) %>%
+  mutate(across(where(is.numeric), ~ round(.,3))) %>%
+  unite(confintmd, all_of(c('accslomd', 'accsupmd')), sep = '-') %>%
+  unite(confintbag, all_of(c('accslobag', 'accsupbag')), sep = '-')
+
+kable(dfresfin, caption = "Accuracy of the models tested",
+      booktabs = TRUE,
+      col.names = c("Model", "Accuracy", "CI\\textsubscript{95\\%}",
+                    "Accuracy", "CI\\textsubscript{95\\%}"),
+      escape = FALSE,
+      align = 'lcccc') %>%
+  row_spec(0, bold = TRUE, align = 'c' ) %>%
+  add_header_above(header = c(' ' = 1,
+                              'Imputed with the median' = 2,
+                              'Imputed with bagging ' = 2),
+                   bold = TRUE) %>%
+  kable_styling()
+```
+
+```{r tbglm}
+fileconn <- file('glmres.txt')
+writeLines (capture.output(summary(fit_glm)), fileconn)
+close(fileconn)
+
+dbresglm <- read.table('glmres.txt', skip = 10, nrows = 36, header = FALSE, fill = TRUE) %>%
+  select(1:5) %>%
+  filter(V1 != '(Intercept)') %>%
+  mutate(across(c(2,3,5), ~round(., 4))) %>%
+  mutate(V1 =  str_replace_all(V1, '\\_', '\\\\_')) %>%
+  arrange(V5) %>%
+  slice(1:20)
+
+kable(dbresglm, caption = "Results of the logistic regression model (bagging imputation)",
+      booktabs = TRUE,
+      col.names = c("Variable", "Estimate", "Std. error", 'z value', "\\textit{p}"),
+      escape = FALSE) %>%
+  row_spec(0, bold = TRUE) %>%
+  kable_styling()
+
+```
+
+Table \@ref(tab:tbglm) shows the coefficients of the logistic regression model (bagging imputation), ordered by the *p* value. Unfortunately, the `glm` function does not provide the standardized coefficients, thus their absolute values are not comparable; however, we notice that some values are negative, meaning that the values are inversely related wih the outcome. We also see that only `r sum(dbresglm$V5 <= 0.05)` variables out of the `r dim(dbcovidbag)[2]-1` predictors analyzed had a *p* \< 0.05.
+
+The kNN model had the lowest accuracy of all the models tested (`r acc_knnbag` using `bagImpute`). The best number of neighbors was `r btune_knn` (figure \@ref(fig:fktune)).
+
+```{r fktune, fig.cap= 'kNN model. Effect of the number of neighbors on accuracy.'}
+plot(fit_knn, xlab = 'Number of neighbors')
+```
+
+The CART model, when imputation of the data with the median was used, had an accuracy of `r acc_rpartmd`. The best value of the complexity parameter was `r btune_rpart` (figure \@ref(fig:fcptune)). This algorithm allows to visualize a decision tree, hence is highly interpretable (figure \@ref(fig:frpartclatree)). The tree begins with the concentration of d-dimers, closely related with clot formation inside the vessels (intravascular coagulation). The left of the branch leads to the outcome when the condition is met. This model tells us that a patient with d-dimer above 321.5 $\mu$g/mL, with white blood cells above 8899 cell/mL, arterial partial oxigen pressure below 71.5 mm Hg and heart rate above 109, will probably die. On the contrary, a patient with a d-dimer concentration below 321.5 $\mu$g/mL, has more chances of survival. Albeit potentially very useful, the accuracy is modest, and due to the recursive partitioning, it is very easy to overtrain [@irizarry2019c].
+
+```{r fcptune, fig.cap='Classification tree model. Effect of different values of the complexity parameter on model accuracy.'}
+
+plot(fit_rpart)
+```
+
+```{r frpartclatree, fig.cap='Classification tree model. Final decision tree.'}
+plot(fit_rpart$finalModel, margin = 0.1) 
+text(fit_rpart$finalModel, cex = 0.75)
+
+```
+
+Finally, we analyze the performance of the random forests algorithm. It addresses the shortcomings of the CART models, but we lose interpretability. As expected, this machine learning technique gave the best results concerning accuracy. When the data imputed with the median was used, random forests had an accuracy of `r acc_rfmd` . The best number of variables sampled as candidates at each split was `r btune_rf` (figure \@ref(fig:fmtrytune), left panel). Although I did not tune up the number of trees, the right panel of figure \@ref(fig:fmtrytune) shows that the numer used (150) was enough to stabilize the error.
+
+```{r fmtrytune, fig.cap='Random forest model. Left panel: effect of the number of randomly selected predictors on accuracy. Right panel: effect of the number of trees on the stabilization of the MSE', fig.show='hold', out.width='50%'}
+plot(fit_rf, xlab = 'Number of randomly selected predictors')
+plot(fit_rf$finalModel, main = NULL)
+```
+
+Table \@ref(tab:tbvarimp) describes the overall variable importance calculated for the models with the best imputation method using the `varImp` function of the `caret` package. Only the 20 most important variables are shown for each model. It is worth noting the absence of d-dimer (dimd) in the logistic regression model as an important variable, but with the rest variables, although there is no agreement with respect to the order, the algorithms agree in general with the 5 most important variables. Interestingly, the presence of diabetes mellitus or high blood pressure were not included in these models.
+
+```{r tbvarimp}
+dfvarimp <- bind_cols(varimpglm[1:20,], varimpknn[1:20,], varimprpart[1:20,], varimprf[1:20,]) %>%
+  mutate(across(where(is.numeric), ~ round(., 2)))
+
+kable(dfvarimp, caption = "Variable importance of the models with the best imputation performance.",
+      booktabs = TRUE,
+      col.names = c("Predictor", "Overall importance",
+                    "Predictor", "Overall importance",
+                    "Predictor", "Overall importance",
+                    "Predictor", "Overall importance"),
+      align = 'lclclclc') %>%
+  kable_styling(full_width = FALSE) %>%
+  column_spec(2, width = '5em') %>%
+  column_spec(4, width = '5em') %>%
+  column_spec(6, width = '5em') %>%
+  column_spec(8, width = '5em') %>%
+  row_spec(0, bold = TRUE, font_size = 8) %>%
+  add_header_above(header = c('Generalized linear model' = 2,
+                              'k nearest neighbors' = 2,
+                              'CART' = 2,
+                              'Random forests' = 2),
+                   bold = TRUE)
+
+  
+```
+
+# Conclusion
+
+The random forests model with data imputed with the median gave the highest accuracy. Lactic dehydrogenase, d-dimer, partial arterial oxygen pressure, number of neutrophils (a type of white blood cell), oxygen saturation breathing room air, age, number of white blood cells, arterial pH, serum urea and partial arterial carbon dioxide were considered the 10 most important variables by this supervised machine learning model.
+
+Machine learning algorithms are powerful tools and a promising area of research in the clinical setting. They will help in better decision making with complex diseases such as covid-19, but as stated in the TRIPOD requierements, the study design is also important. In this particular case, the data was gathered from the everyday hospital records, hence the quality during data acquisition is compromised; the typos and data missingness are examples of this problem. Another limitation could be that the sample size was not calculated *a priori*, I only used the amount of patients hospitalized in a certain time frame. The estimation of the sample size for classification algorithms in an open question [@brownlee2017]. However, given the number of predictors and the type of classification models used, we do not expect that the sample size used could bias the results obtained [@vabalas2019].
+
+Finally, the strategy used in this work did not include a validation data set. As future work, we plan to use the random forests prediction algorithm, and test it prospectively, with a completely different data set and check its performance.
+
+# References
