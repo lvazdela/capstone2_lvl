@@ -100,12 +100,12 @@ Medical researchers often use prediction models as an aid to estimate the probab
 
 : TRIPOD items concerning the presentation of results [from [@collins2015])]. (\#tab:tripod2)
 
-I will use a database of hospitalized patients from a Mexican hospital and try to build an outcom prediction model. The database comprises information from `r cases` hospital records, with `r variables` variables. Table \@ref(tab:tbrawdb) shows the column names of the database, with a short description of their meaning and the codification or units employed. I will also use the TRIPOD items as the framework to build the statistical analysis and the presentation of results. Besides, I will try to demonstrate the skills acquired concerning data wrangling. The key steps are summarized as follows:
+I will use a database of hospitalized patients from a Mexican hospital and try to build an outcome prediction model. The database comprises information from `r cases` hospital records, with `r variables` variables. Table \@ref(tab:tbrawdb) shows the column names of the database, with a short description of their meaning and the codification or units employed. I will also use the TRIPOD items as the framework to build the statistical analysis and the presentation of results. Besides, I will try to demonstrate the skills acquired concerning data wrangling. The key steps are summarized as follows:
 
 -   Prepare the database for a suitable statistical analysis.
 -   Explore the data, to decide which variables will be used as predictors (*preprocessing*). In this step, I will use bivariate analysis and imputation methods.
 -   Split the data set into train and test sets.
--   Use logistic regression, k-nearest neighbors, classification and regression trees (CART) and random forest as prediction algorithms. I will use bootstrap as a resampling method to tune-up the parameters. I will use the `caret` package to build the algorithms.
+-   Use logistic regression, k-nearest neighbors, classification and regression trees (CART) and random forest as prediction algorithms. I will use bootstrap as a resampling method to tune up the parameters. I will use the `caret` package to build the algorithms.
 -   Compare the performance of the algorithms with the *overall accuracy* in the test set.
 
 ```{r tbrawdb}
@@ -475,7 +475,7 @@ Logistic regression is a specific case of a set of *generalized linear models*, 
 
 When we build classification or regression models, because the data are random, the parameters and results obtained are also random variables. If we repeat the experiment the results are going to be different. According to the law of big numbers, after a lot of repetitions, results will tend to converge. Thus, one of the most important concepts in machine learning is the use of a resampling technique to stabilize the results. The `caret` package has a number of functions that help us to develop a good strategy for model building, including resampling. Once we preprocessed the data, the next step is to create a training set and a test set using the function `createDataPartition`.The text book of the course recommends the training set to be the biggest. Because the final data has `r dim(dbcovidbag)[1]` cases, to keep a decent amount of cases in the test set, I decided to partition the data into 85% of the cases for the training set and the remaining for the test set. Next, I chose the resampling method embedded in the function `train`. In this work I decided to use *bootstrap*; it is computationaly more expensive than *k-fold cross validation*, but the size of the data set makes it feasible.
 
-Before training any algorithm, we must decide on which evaluation metric to use. During the training step, the `train` function uses the *accuracy* as the default when the outcome is binary. *Overall accuracy* is defined as the proportion of cases that were correctly predicted in the test set [@irizarry2019a]. The function `confusionMatrix` calculates all the metrics for binary outcomes, and I will use it to calculate the overall accuracy.
+Before training any algorithm, we must decide on which evaluation metric to use. *Overall accuracy* is defined as the proportion of cases that were correctly predicted in the test set [@irizarry2019a]. The function `confusionMatrix` calculates all the metrics for binary outcomes, and I will use it to calculate the overall accuracy.
 
 Many algorithms have parameters that have to be calibrated by means of resampling. For the algorithms selected in this work we have the following parameters:
 
