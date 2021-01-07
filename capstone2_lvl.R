@@ -34,6 +34,8 @@ engvarnum <- read_lines(urlengvarnum)
 # DATA WRANGLING ----------------------------------------------------------
 
 # dataframe of variables in dbcovid.
+nomvar <- dbcovid %>%
+  names
 rawdb <- tibble(code = nomvar, Description = engvar, cod_units = codunits)
 
 #Manage date columns
@@ -49,11 +51,6 @@ fpatron <- function(x){
 
 errores <- apply(dbcovid[, nomcadenas],2,fpatron )
 dberrores <- data.frame(mistakes = unlist(errores))
-kable(dberrores, caption = 'Typos in numeric variables.',
-      col.names = c('Typos in numeric variables'),
-      booktabs = TRUE) %>%
-  row_spec(0, bold = TRUE) %>%
-  kable_styling(latex_options = c('hold_position'))
 
 #Check errors in numeric variables
 nomcadenas <- c('urea', 'creat', 'bun', 'plaq', 'ca', 'aat', 'alat')

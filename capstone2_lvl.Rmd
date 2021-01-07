@@ -671,7 +671,7 @@ btune_rf <- fit_rf$bestTune %>% pull
 
 The four models tested were trained with both imputation methods [^2]. The summary of the accuracy obtained with each method is presented in table \@ref(tab:tbfinres), together with the 95% confidence interval. While the imputation method had little influence in the accuracy of the logistic regression and de kNN models, the CART and random forests algorithms tended to perform better with the median imputation, although the confidence intervals overlap. The algoritm that renders the best accuracy is the random forests with median imputation (`r acc_rfmd`).
 
-[^2] For the sake of clarity in the manuscript, I decided to omit the code. Please [us this link](https://raw.githubusercontent.com/lvazdela/capstone2_lvl/main/capstone2_lvl.R) to open the corresponding R Script file.
+[^2]: For the sake of clarity in the manuscript, I decided to omit the code. Please [use this link](https://raw.githubusercontent.com/lvazdela/capstone2_lvl/main/capstone2_lvl.R) to open the corresponding R Script file.
 
 ```{r tbfinres}
 accsmd <- c(acc_glmmd, acc_knnmd, acc_rpartmd, acc_rfmd)
